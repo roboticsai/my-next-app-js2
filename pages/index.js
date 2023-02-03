@@ -17,10 +17,12 @@ import FormLabel from '@mui/material/FormLabel';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+
+import Box from '@mui/material/Box';
+import NativeSelect from '@mui/material/NativeSelect';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 
 function createData(name, calories, fat, carbs, protein) {
   return { name, calories, fat, carbs, protein };
@@ -36,14 +38,20 @@ const rows = [
 
 export default function BasicTable() {
   return (
-    <Stack direction="row" spacing={3}>
-      <Container sx={ {m: 2} }>
-        <EmployeeList />
-      </Container>
-      <Container>
-        <EmployeeDetail />
-      </Container>      
-    </Stack>
+    <stack spacing={3}>
+      <Stack direction="row" spacing={3}>
+        <Container sx={ {m: 2} }>
+          <EmployeeList />
+        </Container>
+        <Container>
+          <EmployeeDetail />
+        </Container>   
+      </Stack>
+      <ButtonGroup variant="contained" aria-label="outlined primary button group">
+        <Button sx={ { m:1 } }>Submit</Button>
+        <Button sx={ { m:1 } }>Cancel</Button>
+      </ButtonGroup> 
+    </stack>
   );
 }
 
@@ -128,34 +136,53 @@ function EmployeeDetail() {
 
 function Qualification() {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 100 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+    <Stack spacing={1}>
+      <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <InputLabel>Employee Qualification</InputLabel>
+              <NativeSelect
+                defaultValue={10}
+                inputProps={{
+                  name: 'age',
+                  id: 'uncontrolled-native',
+                }}
+              >
+                <option value={10}>SLC</option>
+                <option value={20}>BE</option>
+                <option value={30}>ME</option>
+              </NativeSelect>
+            </FormControl>
+          </Box>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 100 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Stack>
+
   );
 }
