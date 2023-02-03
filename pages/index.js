@@ -37,10 +37,10 @@ const rows = [
 export default function BasicTable() {
   return (
     <Stack direction="row" spacing={3}>
-      <Container maxWidth="sm">
+      <Container sx={ {m: 2} }>
         <EmployeeList />
       </Container>
-      <Container maxWidth="sm">
+      <Container>
         <EmployeeDetail />
       </Container>      
     </Stack>
@@ -88,13 +88,13 @@ function EmployeeDetail() {
     setValue(newValue);
   };
   return (
-    <Stack>
+    <Stack sx={ {m: 2} } spacing={3}>
       <Stack direction="row" spacing={3}>
         <InputLabel>Name</InputLabel>
         <TextField />
       </Stack>
       <FormControl>
-        <FormLabel id="demo-row-radio-buttons-group-label">Gender</FormLabel>
+        <FormLabel sx={ {m: 2} } id="demo-row-radio-buttons-group-label">Gender</FormLabel>
         <RadioGroup
           row
           aria-labelledby="demo-row-radio-buttons-group-label"
@@ -117,6 +117,45 @@ function EmployeeDetail() {
           />
         </LocalizationProvider>
       </Stack>
+      <Stack direction="row" spacing={3}>
+        <InputLabel>Salary</InputLabel>
+        <TextField />
+      </Stack>
+      <Qualification />
     </Stack>
+  );
+}
+
+function Qualification() {
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 100 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Dessert (100g serving)</TableCell>
+            <TableCell align="right">Calories</TableCell>
+            <TableCell align="right">Fat&nbsp;(g)</TableCell>
+            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.calories}</TableCell>
+              <TableCell align="right">{row.fat}</TableCell>
+              <TableCell align="right">{row.carbs}</TableCell>
+              <TableCell align="right">{row.protein}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
