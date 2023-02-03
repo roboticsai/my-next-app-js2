@@ -40,12 +40,8 @@ export default function BasicTable() {
   return (
     <stack spacing={3}>
       <Stack direction="row" spacing={3}>
-        <Container sx={ {m: 2} }>
-          <EmployeeList />
-        </Container>
-        <Container>
-          <EmployeeDetail />
-        </Container>   
+        <EmployeeList />
+        <EmployeeDetail />  
       </Stack>
       <ButtonGroup variant="contained" aria-label="outlined primary button group">
         <Button sx={ { m:1 } }>Submit</Button>
@@ -57,8 +53,8 @@ export default function BasicTable() {
 
 function EmployeeList() {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 100 }} aria-label="simple table">
+    <TableContainer component={Paper} sx={ {m:2, p:2} }>
+      <Table sx={{ minWidth: 100, m: 1 }} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Dessert (100g serving)</TableCell>
@@ -96,7 +92,7 @@ function EmployeeDetail() {
     setValue(newValue);
   };
   return (
-    <Stack sx={ {m: 2} } spacing={3}>
+    <Stack component={Paper} sx={ {m:2, p:2} } spacing={3}>
       <Stack direction="row" spacing={3}>
         <InputLabel>Name</InputLabel>
         <TextField />
@@ -136,23 +132,27 @@ function EmployeeDetail() {
 
 function Qualification() {
   return (
+    <Container component={Paper} sx={ {m:2, p:2} }>
     <Stack spacing={1}>
-      <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
-              <InputLabel>Employee Qualification</InputLabel>
-              <NativeSelect
-                defaultValue={10}
-                inputProps={{
-                  name: 'age',
-                  id: 'uncontrolled-native',
-                }}
-              >
-                <option value={10}>SLC</option>
-                <option value={20}>BE</option>
-                <option value={30}>ME</option>
-              </NativeSelect>
-            </FormControl>
-          </Box>
+      <FormControl fullWidth>
+        <Stack direction="row">
+          <InputLabel>Qualification</InputLabel>
+          <NativeSelect
+            sx={{m:1}}
+            defaultValue={10}
+            inputProps={{
+              name: 'age',
+              id: 'uncontrolled-native',
+            }}
+          >
+            <option value={10}>SLC</option>
+            <option value={20}>BE</option>
+            <option value={30}>ME</option>
+          </NativeSelect>
+          <TextField sx={{m:1}}/>
+          <Button sx={{m:1}} variant="contained" href="#contained-buttons">Add</Button>
+        </Stack>
+      </FormControl>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 100 }} aria-label="simple table">
           <TableHead>
@@ -183,6 +183,6 @@ function Qualification() {
         </Table>
       </TableContainer>
     </Stack>
-
+    </Container>
   );
 }
