@@ -1,14 +1,14 @@
 {
     "Employee": {
-        "Id": { "number": {} },
+        "Id": { "string": {} },
         "Name": { "string": {} },
-        "Gender": { "number": {} },
+        "Gender": { "string": {} },
         "DOB": { "string": {} },
-        "Salary": { "number": {} },
+        "Salary": { "string": {} },
         "Qualification": {
-            "Id": { "number": {} },
+            "Id": { "string": {} },
             "Name": { "string": {} },
-            "Marks": { "number": {} }
+            "Marks": { "string": {} }
         }
     }
 }
