@@ -84,6 +84,14 @@ function EmployeeList({rows}) {
 }
 
 function EmployeeDetail({rows, id}) {
+  const [formInput, setFormInput] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      name: "",
+      email: ""
+    }
+  );
+  
   const [value, setValue] = React.useState(dayjs('2014-08-18T21:11:54'));
 
   var row = rows.find(r => r.id === id)

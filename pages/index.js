@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -27,6 +26,8 @@ import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import useSWR from 'swr'
 import { useState } from 'react';
+import { useReducer } from "react";
+import { Form } from 'react'
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
@@ -53,6 +54,14 @@ function EmployeeList({rows}) {
   function handleClick(employeeId) {
     setEmployeeId(employeeId)
   }
+  function setGender(id) {
+    if(id==0)
+      return 'Male'
+    else if(id==1)
+      return 'Female'
+    else if(id==2)
+      return 'Third Gender'
+  }
   return (
     <Stack direction="row" spacing={3}>
         <TableContainer component={Paper} sx={ {m:2, p:2} }>
@@ -75,7 +84,7 @@ function EmployeeList({rows}) {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell align="right">{row.gender}</TableCell>
+                <TableCell align="right">{setGender(row.gender)}</TableCell>
                 <TableCell align="right">{row.salary}</TableCell>
                 <TableCell align="right">{row.dob}</TableCell>
               </TableRow>
@@ -89,48 +98,96 @@ function EmployeeList({rows}) {
 }
 
 function EmployeeDetail({rows, employeeId}) {
-  const [value, setValue] = React.useState(dayjs('2014-08-18T21:11:54'));
   var detail = rows.find(r => r.employeeId === employeeId)
-  console.log('detail', detail)
-  const handleChange = (newValue) => {
-    setValue(newValue);
+  console.log('qualifications', detail)
+
+  const [formInput, setFormInput] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      name: detail.name,
+      gender: detail.gender,
+      dob: detail.dob,
+      salary: detail.salary, 
+      qualifications: detail.qualificationList
+    }
+  );
+
+  const handleSubmit = evt => {
+    evt.preventDefault();
+
+    let data = { formInput };
+
+    fetch("https://localhost:7115/api/employees", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(response => response.json())
+      .then(response => console.log("Success:", JSON.stringify(response)))
+      .catch(error => console.error("Error:", error));
   };
+
+  const handleChange = evt => {
+    const name = evt.target.name;
+    const newValue = evt.target.value;
+    setFormInput({ [name]: newValue });
+  };
+
   return (
-    <Stack component={Paper} sx={ {m:2, p:2} } spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <InputLabel>Name</InputLabel>
-        <TextField label={detail.name} />
-      </Stack>
-      <FormControl>
-        <FormLabel sx={ {m: 2} } id="demo-row-radio-buttons-group-label">Gender</FormLabel>
-        <RadioGroup
-          row
-          aria-labelledby="demo-row-radio-buttons-group-label"
-          name="row-radio-buttons-group"
-        >
-          <FormControlLabel value="female" control={<Radio />} label="Female" />
-          <FormControlLabel value="male" control={<Radio />} label="Male" />
-          <FormControlLabel value="other" control={<Radio />} label="Other" />
-        </RadioGroup>
-      </FormControl>
-      <Stack direction="row" spacing={3}>
-        <FormLabel id="demo-row-radio-buttons-group-label">DOB</FormLabel>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DesktopDatePicker
-              label="Date desktop"
-              inputFormat="MM/DD/YYYY"
-              value={value}
-              onChange={handleChange}
-              renderInput={(params) => <TextField {...params} />}
+    <div>
+      <Paper sx={ {m:2, p:2} } spacing={3}>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Name"
+            id="margin-normal"
+            name="name"
+            defaultValue={formInput.name}
+            onChange={handleChange}
           />
-        </LocalizationProvider>
-      </Stack>
-      <Stack direction="row" spacing={3}>
-        <InputLabel>Salary</InputLabel>
-        <TextField label={detail.salary} />
-      </Stack>
-      <Qualification rows={detail.qualifications}/>
-    </Stack>
+          <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
+          <RadioGroup
+            row
+            defaultValue={formInput.gender}
+            aria-labelledby="demo-row-radio-buttons-group-label"
+            name="row-radio-buttons-group"
+            onChange={handleChange}
+          >
+            <FormControlLabel value="0" control={<Radio />} label="Male" />
+            <FormControlLabel value="1" control={<Radio />} label="Female" />
+            <FormControlLabel value="2" control={<Radio />} label="Third Gender" />
+          </RadioGroup>
+          <Stack direction="row" spacing={3}>
+            <FormLabel id="demo-row-radio-buttons-group-label">DOB</FormLabel>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DesktopDatePicker
+                label="Date desktop"
+                inputFormat="MM/DD/YYYY"
+                value={detail.dob}
+                onChange={handleChange}
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </LocalizationProvider>
+          </Stack>
+          <TextField
+            label="Salary"
+            id="margin-normal"
+            name="salary"
+            defaultValue={formInput.salary}
+            onChange={handleChange}
+          />
+          <Qualification rows={detail.qualifications} />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+          Submit 
+          </Button>
+        </form>
+      </Paper>
+    </div>
   );
 }
 
@@ -153,7 +210,11 @@ function Qualification({rows}) {
             <option value={20}>BE</option>
             <option value={30}>ME</option>
           </NativeSelect>
-          <TextField sx={{m:1, minWidth: 100, minHeight:50 }}/>
+          <TextField
+            label="Marks"
+            id="margin-normal"
+            name="marks"
+          />
           <Button sx={{m:1, minWidth: 100, minHeight:50 }} variant="contained" href="#contained-buttons">Add</Button>
         </Stack>
       </FormControl>
@@ -169,11 +230,11 @@ function Qualification({rows}) {
           <TableBody>
             {rows.map((row) => (
               <TableRow
-                key={row.qualificationId}
+                key={row.qualificationListId}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.qualificationId}
+                  {row.qualificationListId}
                 </TableCell>
                 <TableCell align="right">{row.qualificationList.qualificationName}</TableCell>
                 <TableCell align="right">{row.marks}</TableCell>
