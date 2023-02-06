@@ -48,7 +48,7 @@ function Profile() {
 }
 
 function EmployeeList({rows}) {
-  const emp_id = 0
+  var emp_id = 0
   function onRowClick(id) {
     emp_id = id;
   }
@@ -187,4 +187,9 @@ function Qualification({rows}) {
           </TableBody>
         </Table>
       </TableContainer>
-    </Stack
+    </Stack>
+    </Container>
+  );
+}
+
+export default Profile
