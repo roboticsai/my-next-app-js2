@@ -26,6 +26,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import useSWR from 'swr'
+import { useState } from 'react';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
@@ -34,7 +35,6 @@ function Profile() {
 
   if (error) return <div>Failed to load</div>
   if (!data) return <div>Loading...</div>
-  console.log(data)
 
   return (
     <stack spacing={3}>
@@ -48,9 +48,10 @@ function Profile() {
 }
 
 function EmployeeList({rows}) {
-  var emp_id = 0
-  function onRowClick(id) {
-    emp_id = id;
+  const [employeeId, setEmployeeId] = useState(1);
+
+  function handleClick(employeeId) {
+    setEmployeeId(employeeId)
   }
   return (
     <Stack direction="row" spacing={3}>
@@ -59,8 +60,7 @@ function EmployeeList({rows}) {
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell align="right">Gender</TableCell>
-              <TableCell align="right">Qualification&nbsp;(g)</TableCell>
+              <TableCell align="right">Gender&nbsp;(g)</TableCell>
               <TableCell align="right">Salary&nbsp;(g)</TableCell>
               <TableCell align="right">DOB&nbsp;(g)</TableCell>
             </TableRow>
@@ -68,31 +68,30 @@ function EmployeeList({rows}) {
           <TableBody>
             {rows.map((row) => (
               <TableRow
-                key={row.qualificationId}
+                key={row.employeeId}
+                onClick={() => handleClick(row.employeeId)}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
                 <TableCell align="right">{row.gender}</TableCell>
-                <TableCell align="right">{row.qualification}</TableCell>
                 <TableCell align="right">{row.salary}</TableCell>
-                <TableCell align="right">{row.dog}</TableCell>
+                <TableCell align="right">{row.dob}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <EmployeeDetail rows={rows} id={emp_id}/>  
+      <EmployeeDetail rows={rows} employeeId={employeeId}/>  
     </Stack>
   );
 }
 
-function EmployeeDetail({rows, id}) {
+function EmployeeDetail({rows, employeeId}) {
   const [value, setValue] = React.useState(dayjs('2014-08-18T21:11:54'));
-
-  var row = rows.find(r => r.id === id)
-  console.log(row)
+  var detail = rows.find(r => r.employeeId === employeeId)
+  console.log('detail', detail)
   const handleChange = (newValue) => {
     setValue(newValue);
   };
@@ -100,7 +99,7 @@ function EmployeeDetail({rows, id}) {
     <Stack component={Paper} sx={ {m:2, p:2} } spacing={3}>
       <Stack direction="row" spacing={3}>
         <InputLabel>Name</InputLabel>
-        <TextField />
+        <TextField label={detail.name} />
       </Stack>
       <FormControl>
         <FormLabel sx={ {m: 2} } id="demo-row-radio-buttons-group-label">Gender</FormLabel>
@@ -128,9 +127,9 @@ function EmployeeDetail({rows, id}) {
       </Stack>
       <Stack direction="row" spacing={3}>
         <InputLabel>Salary</InputLabel>
-        <TextField />
+        <TextField label={detail.salary} />
       </Stack>
-      <Qualification rows={rows}/>
+      <Qualification rows={detail.qualifications}/>
     </Stack>
   );
 }
@@ -162,26 +161,22 @@ function Qualification({rows}) {
         <Table sx={{ minWidth: 100 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              <TableCell>Qualification Id</TableCell>
+              <TableCell align="right">Name</TableCell>
+              <TableCell align="right">Marks</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
               <TableRow
-                key={row.name}
+                key={row.qualificationId}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  {row.qualificationId}
                 </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
+                <TableCell align="right">{row.qualificationList.qualificationName}</TableCell>
+                <TableCell align="right">{row.marks}</TableCell>
               </TableRow>
             ))}
           </TableBody>
