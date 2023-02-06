@@ -33,7 +33,7 @@ import useSWRMutation from 'swr/mutation'
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
-function Profile() {
+function EmployeeSPA() {
   const { data, error } = useSWR('https://localhost:7115/api/employees', fetcher)
 
   if (error) return <div>Failed to load</div>
@@ -103,25 +103,13 @@ async function sendRequest(url, { arg }) {
 function EmployeeDetail({rows, employeeId}) {
   const { trigger, isMutating } = useSWRMutation('https://localhost:7115/api/employees', sendRequest, /* options */)
 
-  var detail = rows.find(r => r.employeeId === employeeId)
-  
-  const { mutate } = useSWRConfig()
-
-  const [formInput, setFormInput] = useReducer(
-    (state, newState) => ({ ...state, ...newState }),
-    {
-      name: detail.name,
-      gender: detail.gender,
-      dob: detail.dob,
-      salary: detail.salary, 
-      qualificationList: detail.qualificationList
-    }
-  );
+  var employee = rows.find(r => r.employeeId === employeeId)
 
   const handleSubmit = evt => {
+    console.log("submittiing", formInput)
     async () => {
       try {
-        const result = await trigger({ formInput }, /* options */)
+        const result = await trigger({ employee }, /* options */)
       } 
       catch (e) {
         // error handling
@@ -132,7 +120,6 @@ function EmployeeDetail({rows, employeeId}) {
     const name = evt.target.name;
     const newValue = evt.target.value;
     setFormInput({ [name]: newValue });
-    console.log(formInput)
   };
 
   return (
@@ -143,13 +130,13 @@ function EmployeeDetail({rows, employeeId}) {
             label="Name"
             id="margin-normal"
             name="name"
-            defaultValue={formInput.name}
+            defaultValue={employee.name}
             onChange={handleChange}
           />
           <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
           <RadioGroup
             row
-            defaultValue={formInput.gender}
+            defaultValue={employee.gender}
             aria-labelledby="demo-row-radio-buttons-group-label"
             name="row-radio-buttons-group"
             onChange={handleChange}
@@ -164,7 +151,7 @@ function EmployeeDetail({rows, employeeId}) {
               <DesktopDatePicker
                 label="Date desktop"
                 inputFormat="MM/DD/YYYY"
-                value={formInput.dob}
+                value={employee.dob}
                 onChange={handleChange}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -174,10 +161,10 @@ function EmployeeDetail({rows, employeeId}) {
             label="Salary"
             id="margin-normal"
             name="salary"
-            defaultValue={formInput.salary}
+            defaultValue={employee.salary}
             onChange={handleChange}
           />
-          <Qualification rows={detail.qualifications} />
+          <Qualification rows={employee.qualifications} />
           <Button
             type="submit"
             variant="contained"
@@ -249,4 +236,4 @@ function Qualification({rows}) {
   );
 }
 
-export default Profile
+export default EmployeeSPA
