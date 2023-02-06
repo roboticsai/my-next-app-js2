@@ -28,6 +28,8 @@ import useSWR from 'swr'
 import { useState } from 'react';
 import { useReducer } from "react";
 import { Form } from 'react'
+import { useSWRConfig } from "swr"
+import useSWRMutation from 'swr/mutation'
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
@@ -38,13 +40,7 @@ function Profile() {
   if (!data) return <div>Loading...</div>
 
   return (
-    <stack spacing={3}>
       <EmployeeList rows={data}/>
-      <ButtonGroup variant="contained" aria-label="outlined primary button group">
-        <Button sx={ { m:1 } }>Submit</Button>
-        <Button sx={ { m:1 } }>Cancel</Button>
-      </ButtonGroup> 
-    </stack>
   )
 }
 
@@ -97,9 +93,19 @@ function EmployeeList({rows}) {
   );
 }
 
+async function sendRequest(url, { arg }) {
+  return fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(arg)
+  }).then(res => res.json())
+}
+
 function EmployeeDetail({rows, employeeId}) {
+  const { trigger, isMutating } = useSWRMutation('https://localhost:7115/api/employees', sendRequest, /* options */)
+
   var detail = rows.find(r => r.employeeId === employeeId)
-  console.log('qualifications', detail)
+  
+  const { mutate } = useSWRConfig()
 
   const [formInput, setFormInput] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
@@ -108,31 +114,25 @@ function EmployeeDetail({rows, employeeId}) {
       gender: detail.gender,
       dob: detail.dob,
       salary: detail.salary, 
-      qualifications: detail.qualificationList
+      qualificationList: detail.qualificationList
     }
   );
 
   const handleSubmit = evt => {
-    evt.preventDefault();
-
-    let data = { formInput };
-
-    fetch("https://localhost:7115/api/employees", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(response => response.json())
-      .then(response => console.log("Success:", JSON.stringify(response)))
-      .catch(error => console.error("Error:", error));
+    async () => {
+      try {
+        const result = await trigger({ formInput }, /* options */)
+      } 
+      catch (e) {
+        // error handling
+      }}
   };
 
   const handleChange = evt => {
     const name = evt.target.name;
     const newValue = evt.target.value;
     setFormInput({ [name]: newValue });
+    console.log(formInput)
   };
 
   return (
@@ -164,7 +164,7 @@ function EmployeeDetail({rows, employeeId}) {
               <DesktopDatePicker
                 label="Date desktop"
                 inputFormat="MM/DD/YYYY"
-                value={detail.dob}
+                value={formInput.dob}
                 onChange={handleChange}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -182,6 +182,7 @@ function EmployeeDetail({rows, employeeId}) {
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isMutating}
           >
           Submit 
           </Button>
