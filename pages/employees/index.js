@@ -26,19 +26,14 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import { GetEmployees } from '../../lib/employee_api';
+import useSWR from 'swr'
 
-export const getStaticProps = async (_context) => {
-  // fetch list of posts
-  const data = await GetEmployees()
-  return {
-    props: {
-      employees: data,
-    },
-  }
-}
+const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
-export default function BasicTable({employees}) {
-  console.log(employees)
+export default function BasicTable() {
+  const { employees, error } = useSWR('https://localhost:7115/api/employees', fetcher)
+  if (error) return <div>Failed to load</div>
+  if (!employees) return <div>Loading...</div>
   return (
     <stack spacing={3}>
       <EmployeeList rows={employees}/>
