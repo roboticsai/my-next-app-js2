@@ -46,10 +46,27 @@ function EmployeeSPA() {
 
 function EmployeeList({rows}) {
   const [employeeId, setEmployeeId] = useState(1);
+  const [formInput, setFormInput] = useReducer(
+    (state, newState) => ({ ...state, ...newState }), 
+    {
+    }
+  );
+
+  function componentDidMount() {
+    var employee = rows.find(r => r.employeeId === employeeId)
+    setFormInput(employee)
+  }
+
+  const handleFormInputChange() {
+    // const name = evt.target.name;
+    // const newValue = evt.target.value;
+    // setFormInput({ [name]: newValue });
+  };
 
   function handleClick(employeeId) {
     setEmployeeId(employeeId)
   }
+
   function setGender(id) {
     if(id==0)
       return 'Male'
@@ -88,58 +105,41 @@ function EmployeeList({rows}) {
           </TableBody>
         </Table>
       </TableContainer>
-      <EmployeeDetail rows={rows} employeeId={employeeId}/>  
+      <EmployeeDetail formInput={formInput} onFormInputChange={handleFormInputChange} />  
     </Stack>
   );
 }
 
-async function sendRequest(url, { arg }) {
-  return fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(arg)
-  }).then(res => res.json())
-}
-
-function EmployeeDetail({rows, employeeId}) {
-  const { trigger, isMutating } = useSWRMutation('https://localhost:7115/api/employees', sendRequest, /* options */)
-
-  var employee = rows.find(r => r.employeeId === employeeId)
+function EmployeeDetail({formInput, onFormInputChange}) {
 
   const handleSubmit = evt => {
-    console.log("submittiing", formInput)
-    async () => {
-      try {
-        const result = await trigger({ employee }, /* options */)
-      } 
-      catch (e) {
-        // error handling
-      }}
-  };
-
-  const handleChange = evt => {
-    const name = evt.target.name;
-    const newValue = evt.target.value;
-    setFormInput({ [name]: newValue });
+    // console.log("submittiing", formInput)
+    // async () => {
+    //   try {
+    //     const result = await trigger({ employee }, /* options */)
+    //   } 
+    //   catch (e) {
+    //     // error handling
+    //   }}
   };
 
   return (
-    <div>
       <Paper sx={ {m:2, p:2} } spacing={3}>
         <form onSubmit={handleSubmit}>
-          <TextField
+        <TextField
             label="Name"
             id="margin-normal"
             name="name"
-            defaultValue={employee.name}
-            onChange={handleChange}
+            value={formInput.name}
+            onChange={(e) => onFormInputChange(e.target.name)}
           />
           <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
           <RadioGroup
             row
-            defaultValue={employee.gender}
+            value={formInput.gender}
             aria-labelledby="demo-row-radio-buttons-group-label"
             name="row-radio-buttons-group"
-            onChange={handleChange}
+            onChange={(e) => onFormInputChange(e.target.value)}
           >
             <FormControlLabel value="0" control={<Radio />} label="Male" />
             <FormControlLabel value="1" control={<Radio />} label="Female" />
@@ -151,8 +151,8 @@ function EmployeeDetail({rows, employeeId}) {
               <DesktopDatePicker
                 label="Date desktop"
                 inputFormat="MM/DD/YYYY"
-                value={employee.dob}
-                onChange={handleChange}
+                value={formInput.dob}
+                onChange={(e) => onFormInputChange(e.target.value)}
                 renderInput={(params) => <TextField {...params} />}
               />
             </LocalizationProvider>
@@ -161,21 +161,19 @@ function EmployeeDetail({rows, employeeId}) {
             label="Salary"
             id="margin-normal"
             name="salary"
-            defaultValue={employee.salary}
-            onChange={handleChange}
+            value={formInput.salary}
+            onChange={(e) => onFormInputChange(e.target.value)}
           />
-          <Qualification rows={employee.qualifications} />
+          {/* <Qualification rows={formInput.qualifications} /> */}
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            disabled={isMutating}
           >
           Submit 
           </Button>
         </form>
       </Paper>
-    </div>
   );
 }
 
